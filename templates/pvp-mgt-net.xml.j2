@@ -1,0 +1,16 @@
+<network>
+  <name>pvp-mgt</name>
+  <bridge name="pvpbr0"/>
+  <forward/>
+  <dns>
+    <host ip="{{ guest_ip }}">
+      <hostname>{{ guest_name }}</hostname>
+    </host>
+  </dns>
+  <ip address="192.168.40.1" netmask="255.255.255.0">
+    <dhcp>
+      <range start="192.168.40.2" end="192.168.40.254"/>
+      <host mac="{{ guest_mac }} " ip="{{ guest_ip }}"/>
+    </dhcp>
+  </ip>
+</network>

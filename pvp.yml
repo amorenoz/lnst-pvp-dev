@@ -1,0 +1,143 @@
+- name: Vhost-Net Setup
+  hosts: pvp-host
+  vars_files:
+    - vars/pvp-settings.yml
+  tasks:
+  - debug: 
+      msg: Debug mode is enabled
+  - name: install dependencies
+    yum:
+      name:
+        - qemu-kvm
+        - libvirt
+        - iperf3
+        - virt-install
+        - libguestfs-tools-c
+        - python3-lxml
+      state: installed
+
+  - name: Check if the image file exists
+    stat:
+      path: "{{ vm_image_file }}"
+    register: local_image
+  
+  - name: Check that the base image exists
+    stat:
+      path: "{{ base_image_file }}"
+    register: base_image
+    when: local_image.stat.exists == False
+  
+  - name: download base image
+    get_url:
+      url: '{{ remote_image }}'
+      dest: "{{ base_image_file }}"
+      mode: '0640'
+    when:
+      - local_image.stat.exists == False 
+      - base_image.stat.exists == False 
+
+# Create and start the default network
+  - name: Destroy previous default network
+    virt_net:
+      state: absent
+      name: pvp-mgt
+
+  - name: Define default network
+    virt_net:
+      command: define
+      name: pvp-mgt
+      xml: "{{ lookup('template', 'pvp-mgt-net.xml.j2') }}"
+
+  - name: Start mgt network
+    virt_net:
+      state: active
+      name: pvp-mgt
+
+# Create the VM
+  - name: Destroy the guest VM (in case name colision)
+    virt:
+      name: "{{ guest_name }}"
+      state: destroyed
+    ignore_errors: true
+
+# Create our VM image using the base image as backing store
+  - name: Create image
+    command: >
+        qemu-img create -f qcow2 -b
+         {{ base_image_file }}
+         {{ vm_image_file }}
+         20G
+
+  - name: Prepare image
+    command: >
+       virt-sysprep --root-password password:{{ guest_root_password }}
+         --uninstall cloud-init
+         --selinux-relabel
+         -a {{ vm_image_file }}
+         --hostname {{ guest_name }}
+
+  - name: Undefine guest vm (in case name colision)
+    virt:
+      command: undefine
+      name: "{{ guest_name }}"
+    ignore_errors: true
+
+  - name: Define the VM
+    virt:
+      command: define
+      name: "{{ guest_name}}"
+      xml: "{{ lookup('template', 'guest.xml.j2') }}"
+      autostart: no
+
+
+  - name: Start the VM
+    virt:
+      name: "{{ guest_name}}"
+      state: running
+
+  - name: Wait for port 22 to become available on guest
+    wait_for:
+      host: "{{ guest_ip }}"
+      port: 22
+      delay: 5
+
+# Add the guest to the inventory to continue running commands in it
+  - name:
+    add_host:
+      name: "{{ guest_ip }}"
+      group: guests
+      ansible_ssh_pass: "{{ guest_root_password }}"
+      ansible_ssh_user: root
+      ansible_ssh_common_args: -o UserKnownHostsFile="/dev/null" -o StrictHostKeyChecking=no
+
+- name: Vhost-User Guest Setup
+  hosts: guests
+  vars_files:
+    - vars/pvp-settings.yml
+  tasks:
+
+  - name: install repository
+    yum_repository:
+      name: virtio-auto-{{ index }}
+      description: virtio-auto repository
+      baseurl: "{{ item }}"
+      gpgcheck: no
+    loop: "{{ guest_repos }}"
+    loop_control:
+      index_var: index
+
+  - name: Install dependencies
+    yum:
+      state: installed
+      name:
+        - git
+        - python3
+        - python3-devel
+        - driverctl
+        - libvirt-devel
+        - libnl3-devel
+        - libnl-devel
+
+
+
+
