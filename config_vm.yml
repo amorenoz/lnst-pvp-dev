@@ -1,0 +1,77 @@
+# This task requires the following variables
+# base_image_file:
+# remote_image:
+# vm_image_file:
+# vm_name:
+# vm_mac:
+# vm_ip:
+# vm_root_password: 
+#
+- name: Check if the image file exists
+  stat:
+    path: "{{ vm_image_file }}"
+  register: local_image
+
+- name: Check that the base image exists
+  stat:
+    path: "{{ vm_base_image_file }}"
+  register: base_image
+  when: local_image.stat.exists == False
+
+- name: download base image
+  get_url:
+    url: '{{ vm_remote_image }}'
+    dest: "{{ vm_base_image_file }}"
+    mode: '0640'
+  when:
+    - local_image.stat.exists == False 
+    - base_image.stat.exists == False 
+
+#Create the VM
+- name: Destroy the guest VM (in case name colision)
+  virt:
+    name: "{{ vm_name }}"
+    state: destroyed
+  ignore_errors: true
+
+# Create our VM image using the base image as backing store
+- name: Create image
+  command: >
+      qemu-img create -f qcow2 -b
+       {{ vm_base_image_file }}
+       {{ vm_image_file }}
+       20G
+
+- name: Prepare image
+  command: >
+     virt-sysprep --root-password password:{{ vm_root_password }}
+       --uninstall cloud-init
+       --selinux-relabel
+       -a {{ vm_image_file }}
+       --hostname {{ vm_name }}
+
+- name: Undefine vm vm (in case name colision)
+  virt:
+    command: undefine
+    name: "{{ vm_name }}"
+  ignore_errors: true
+
+- name: Define the VM
+  virt:
+    command: define
+    name: "{{ vm_name}}"
+    xml: "{{ lookup('template', vm_template ) }}"
+    autostart: no
+
+- name: Start the VM
+  virt:
+    name: "{{ vm_name}}"
+    state: running
+
+- name: Wait for port 22 to become available on vm
+  wait_for:
+    host: "{{ vm_ip }}"
+    port: 22
+    delay: 5
+
+

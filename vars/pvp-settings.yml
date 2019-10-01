@@ -1,6 +1,6 @@
-base_image_file: /var/lib/libvirt/images/rhel8-base.qcow2
-remote_image: http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/images/rhel-guest-image-8.1-109.x86_64.qcow2
-vm_image_file: /var/lib/libvirt/images/pvp-guest1.qcow2
+guest_base_image_file: /var/lib/libvirt/images/rhel8-base.qcow2
+guest_remote_image: http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/images/rhel-guest-image-8.1-109.x86_64.qcow2
+guest_image_file: /var/lib/libvirt/images/pvp-guest1.qcow2
 guest_name: pvp-guest1
 guest_mac: 02:ca:fe:fa:ce:01
 guest_ip: 192.168.40.5

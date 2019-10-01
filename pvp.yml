@@ -16,26 +16,6 @@
         - python3-lxml
       state: installed
 
-  - name: Check if the image file exists
-    stat:
-      path: "{{ vm_image_file }}"
-    register: local_image
-  
-  - name: Check that the base image exists
-    stat:
-      path: "{{ base_image_file }}"
-    register: base_image
-    when: local_image.stat.exists == False
-  
-  - name: download base image
-    get_url:
-      url: '{{ remote_image }}'
-      dest: "{{ base_image_file }}"
-      mode: '0640'
-    when:
-      - local_image.stat.exists == False 
-      - base_image.stat.exists == False 
-
 # Create and start the default network
   - name: Destroy previous default network
     virt_net:
@@ -53,56 +33,19 @@
       state: active
       name: pvp-mgt
 
-# Create the VM
-  - name: Destroy the guest VM (in case name colision)
-    virt:
-      name: "{{ guest_name }}"
-      state: destroyed
-    ignore_errors: true
-
-# Create our VM image using the base image as backing store
-  - name: Create image
-    command: >
-        qemu-img create -f qcow2 -b
-         {{ base_image_file }}
-         {{ vm_image_file }}
-         20G
-
-  - name: Prepare image
-    command: >
-       virt-sysprep --root-password password:{{ guest_root_password }}
-         --uninstall cloud-init
-         --selinux-relabel
-         -a {{ vm_image_file }}
-         --hostname {{ guest_name }}
-
-  - name: Undefine guest vm (in case name colision)
-    virt:
-      command: undefine
-      name: "{{ guest_name }}"
-    ignore_errors: true
-
-  - name: Define the VM
-    virt:
-      command: define
-      name: "{{ guest_name}}"
-      xml: "{{ lookup('template', 'guest.xml.j2') }}"
-      autostart: no
-
-
-  - name: Start the VM
-    virt:
-      name: "{{ guest_name}}"
-      state: running
-
-  - name: Wait for port 22 to become available on guest
-    wait_for:
-      host: "{{ guest_ip }}"
-      port: 22
-      delay: 5
+  - import_tasks: config_vm.yml
+    vars:
+      vm_image_file: "{{ guest_image_file }}"
+      vm_base_image_file: "{{ guest_base_image_file }}"
+      vm_remote_image: "{{ guest_remote_image }}"
+      vm_name: "{{ guest_name }}"
+      vm_ip: "{{ guest_ip }}"
+      vm_mac: "{{ guest_mac }}"
+      vm_root_password: "{{ guest_root_password }}"
+      vm_template: guest.xml.j2
 
 # Add the guest to the inventory to continue running commands in it
-  - name:
+  - name: Add guest to inventory
     add_host:
       name: "{{ guest_ip }}"
       group: guests
@@ -136,8 +79,4 @@
         - driverctl
         - libvirt-devel
         - libnl3-devel
-        - libnl-devel
-
-
-
 
