@@ -6,6 +6,9 @@ guest_mac: 02:ca:fe:fa:ce:01
 guest_ip: 192.168.40.5
 guest_root_password: lnst
 
+guest_lnst_repo: https://github.com/amorenoz/lnst.git
+guest_lnst_ref: master
+
 guest_repos:
   - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/os/
   - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/AppStream/x86_64/os/
@@ -19,6 +22,10 @@ trex_nic1: 02:ca:fe:fa:cc:01
 trex_nic2: 02:ca:fe:fa:cc:02
 trex_ip: 192.168.40.6
 trex_root_password: lnst
+
+trex_lnst_repo: https://github.com/amorenoz/lnst.git
+trex_lnst_ref: master
+
 
 trex_repos:
   - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/os/
