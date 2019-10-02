@@ -107,12 +107,30 @@
     </controller>
 
     <interface type='network'>
-      <mac address='{{ guest_mac }}'/>
+      <mac address='{{ trex_mac }}'/>
       <source network='pvp-mgt' bridge='pvpbr0'/>
       <target dev='vnet0'/>
       <model type='virtio'/>
       <alias name='net0'/>
       <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+    </interface>
+
+    <interface type='network'>
+      <mac address='{{ trex_nic1 }}'/>
+      <source network='pvp-priv1' bridge='pvp-priv1'/>
+      <target dev='vnet1'/>
+      <model type='virtio'/>
+      <alias name='net1'/>
+      <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
+    </interface>
+
+    <interface type='network'>
+      <mac address='{{ trex_nic2 }}'/>
+      <source network='pvp-priv2' bridge='pvp-priv2'/>
+      <target dev='vnet2'/>
+      <model type='virtio'/>
+      <alias name='net2'/>
+      <address type='pci' domain='0x0000' bus='0x03' slot='0x00' function='0x0'/>
     </interface>
 
     <serial type='pty'>

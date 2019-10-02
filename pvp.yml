@@ -33,6 +33,39 @@
       state: active
       name: pvp-mgt
 
+# Create and start the default network
+  - name: Destroy previous private networks
+    virt_net:
+      state: absent
+      name: pvp-priv1
+
+  - name: Define default network
+    virt_net:
+      command: define
+      name: pvp-priv1
+      xml: "{{ lookup('template', 'pvp-priv1.xml.j2') }}"
+
+  - name: Start mgt network
+    virt_net:
+      state: active
+      name: pvp-priv1
+
+  - name: Destroy previous private networks
+    virt_net:
+      state: absent
+      name: pvp-priv2
+
+  - name: Define default network
+    virt_net:
+      command: define
+      name: pvp-priv2
+      xml: "{{ lookup('template', 'pvp-priv1.xml.j2') }}"
+
+  - name: Start mgt network
+    virt_net:
+      state: active
+      name: pvp-priv2
+
   - import_tasks: config_vm.yml
     vars:
       vm_image_file: "{{ guest_image_file }}"
@@ -44,12 +77,32 @@
       vm_root_password: "{{ guest_root_password }}"
       vm_template: guest.xml.j2
 
+  - import_tasks: config_vm.yml
+    vars:
+      vm_image_file: "{{ trex_image_file }}"
+      vm_base_image_file: "{{ trex_base_image_file }}"
+      vm_remote_image: "{{ trex_remote_image }}"
+      vm_name: "{{ trex_name }}"
+      vm_ip: "{{ trex_ip }}"
+      vm_mac: "{{ trex_mac }}"
+      vm_root_password: "{{ trex_root_password }}"
+      vm_template: trex.xml.j2
+
+
 # Add the guest to the inventory to continue running commands in it
   - name: Add guest to inventory
     add_host:
       name: "{{ guest_ip }}"
       group: guests
       ansible_ssh_pass: "{{ guest_root_password }}"
+      ansible_ssh_user: root
+      ansible_ssh_common_args: -o UserKnownHostsFile="/dev/null" -o StrictHostKeyChecking=no
+
+  - name: Add trex to inventory
+    add_host:
+      name: "{{ trex_ip }}"
+      group: trex
+      ansible_ssh_pass: "{{ trex_root_password }}"
       ansible_ssh_user: root
       ansible_ssh_common_args: -o UserKnownHostsFile="/dev/null" -o StrictHostKeyChecking=no
 
@@ -66,6 +119,33 @@
       baseurl: "{{ item }}"
       gpgcheck: no
     loop: "{{ guest_repos }}"
+    loop_control:
+      index_var: index
+
+  - name: Install dependencies
+    yum:
+      state: installed
+      name:
+        - git
+        - python3
+        - python3-devel
+        - driverctl
+        - libvirt-devel
+        - libnl3-devel
+
+- name: PVP  TRex Setup
+  hosts: trex
+  vars_files:
+    - vars/pvp-settings.yml
+  tasks:
+
+  - name: install repository
+    yum_repository:
+      name: virtio-auto-{{ index }}
+      description: virtio-auto repository
+      baseurl: "{{ item }}"
+      gpgcheck: no
+    loop: "{{ trex_repos }}"
     loop_control:
       index_var: index
 

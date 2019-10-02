@@ -10,3 +10,17 @@ guest_repos:
   - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/os/
   - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/AppStream/x86_64/os/
 
+trex_base_image_file: /var/lib/libvirt/images/rhel8-base.qcow2
+trex_remote_image: http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/images/rhel-guest-image-8.1-109.x86_64.qcow2
+trex_image_file: /var/lib/libvirt/images/pvp-trex.qcow2
+trex_name: pvp-trex1
+trex_mac: 02:ca:fe:fa:cc:00
+trex_nic1: 02:ca:fe:fa:cc:01
+trex_nic2: 02:ca:fe:fa:cc:02
+trex_ip: 192.168.40.6
+trex_root_password: lnst
+
+trex_repos:
+  - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/os/
+  - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/AppStream/x86_64/os/
+
