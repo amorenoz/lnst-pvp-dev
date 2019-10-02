@@ -39,13 +39,18 @@
       state: absent
       name: pvp-priv1
 
-  - name: Define default network
+  - name: Undefine previous private networks
+    virt_net:
+      command: undefine
+      name: pvp-priv1
+
+  - name: Define p1 network
     virt_net:
       command: define
       name: pvp-priv1
       xml: "{{ lookup('template', 'pvp-priv1.xml.j2') }}"
 
-  - name: Start mgt network
+  - name: Start p1 network
     virt_net:
       state: active
       name: pvp-priv1
@@ -55,16 +60,41 @@
       state: absent
       name: pvp-priv2
 
-  - name: Define default network
+  - name: Undefine previous private networks
+    virt_net:
+      command: undefine
+      name: pvp-priv2
+
+  - name: Define p2 network
     virt_net:
       command: define
       name: pvp-priv2
-      xml: "{{ lookup('template', 'pvp-priv1.xml.j2') }}"
+      xml: "{{ lookup('template', 'pvp-priv2.xml.j2') }}"
 
   - name: Start mgt network
     virt_net:
       state: active
       name: pvp-priv2
+
+  - name: Delete bridge1
+    command: ip link del pvp-priv1
+    ignore_errors: yes
+
+  - name: Delete bridge1
+    command: ip link del pvp-priv2
+    ignore_errors: yes
+
+  - name: Create bridge1
+    command: ip link add name pvp-priv1 type bridge
+
+  - name: Start bridge1
+    command: ip link set pvp-priv1 up
+
+  - name: Create bridge2
+    command: ip link add name pvp-priv2 type bridge
+
+  - name: Start bridge2
+    command: ip link set pvp-priv2 up
 
   - import_tasks: config_vm.yml
     vars:
@@ -122,16 +152,11 @@
     loop_control:
       index_var: index
 
-  - name: Install dependencies
-    yum:
-      state: installed
-      name:
-        - git
-        - python3
-        - python3-devel
-        - driverctl
-        - libvirt-devel
-        - libnl3-devel
+  - import_tasks: install_lnst.yml
+    vars:
+      lnst_repo: "{{ guest_lnst_repo }}"
+      lnst_ref: master
+
 
 - name: PVP  TRex Setup
   hosts: trex
@@ -148,6 +173,11 @@
     loop: "{{ trex_repos }}"
     loop_control:
       index_var: index
+
+  - import_tasks: install_lnst.yml
+    vars:
+      lnst_repo: "{{ trex_lnst_repo }}"
+      lnst_ref: master
 
   - name: Install dependencies
     yum:
