@@ -3,8 +3,11 @@
   <bridge name="pvpbr0"/>
   <forward/>
   <dns>
-    <host ip="{{ guest_ip }}">
-      <hostname>{{ guest_name }}</hostname>
+    <host ip="{{ guest_vars.vm_ip }}">
+      <hostname>{{ guest_vars.vm_name }}</hostname>
+    </host>
+    <host ip="{{ trex_vars.vm_ip }}">
+      <hostname>{{ trex_vars.vm_name }}</hostname>
     </host>
     <host ip="{{ trex_ip }}">
       <hostname>{{ trex_name }}</hostname>
@@ -13,8 +16,8 @@
   <ip address="192.168.40.1" netmask="255.255.255.0">
     <dhcp>
       <range start="192.168.40.2" end="192.168.40.254"/>
-      <host mac="{{ guest_mac }} " ip="{{ guest_ip }}"/>
-      <host mac="{{ trex_mac }} " ip="{{ trex_ip }}"/>
+      <host mac="{{ guest_vars.vm_mac }} " ip="{{ guest_vars.vm_ip }}"/>
+      <host mac="{{ trex_vars.vm_mac }} " ip="{{ trex_vars.vm_ip }}"/>
     </dhcp>
   </ip>
 </network>

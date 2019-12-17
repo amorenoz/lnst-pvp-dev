@@ -7,6 +7,10 @@
 # vm_ip:
 # vm_root_password: 
 #
+- name: Include vars if provided
+  include_vars:
+    file: "vars/{{ vm_extra_vars }}"
+
 - name: Check if the image file exists
   stat:
     path: "{{ vm_image_file }}"

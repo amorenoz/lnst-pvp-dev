@@ -107,7 +107,7 @@
     </controller>
 
     <interface type='network'>
-      <mac address='{{ guest_mac }}'/>
+      <mac address='{{ vm_mac }}'/>
       <source network='pvp-mgt' bridge='pvpbr0'/>
       <target dev='vnet0'/>
       <model type='virtio'/>
