@@ -1,0 +1,19 @@
+# Guest variables.
+#   They can have generic names used in config_vm tasks
+#   or specific used for example to replace in templates
+
+
+vm_base_image_file: /var/lib/libvirt/images/rhel8-base.qcow2
+vm_remote_image: http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/images/rhel-vm-image-8.1-109.x86_64.qcow2
+vm_image_file: /var/lib/libvirt/images/pvp-vm1.qcow2
+vm_name: pvp-vm1
+vm_mac: 02:ca:fe:fa:ce:01
+vm_ip: 192.168.40.5
+vm_root_password: lnst
+
+guest_lnst_repo: https://github.com/amorenoz/lnst.git
+guest_lnst_ref: master
+
+guest_repos:
+  - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/os/
+  - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/AppStream/x86_64/os/

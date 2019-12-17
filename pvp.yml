@@ -3,6 +3,14 @@
   vars_files:
     - vars/pvp-settings.yml
   tasks:
+  - name: Include guest vars
+    include_vars:
+      file: vars/guest.yml
+      name: guest_vars
+  - name: Include trex vars
+    include_vars:
+      file: vars/trex.yml
+      name: trex_vars
   - debug: 
       msg: Debug mode is enabled
   - name: install dependencies
@@ -98,26 +106,13 @@
 
   - import_tasks: config_vm.yml
     vars:
-      vm_image_file: "{{ guest_image_file }}"
-      vm_base_image_file: "{{ guest_base_image_file }}"
-      vm_remote_image: "{{ guest_remote_image }}"
-      vm_name: "{{ guest_name }}"
-      vm_ip: "{{ guest_ip }}"
-      vm_mac: "{{ guest_mac }}"
-      vm_root_password: "{{ guest_root_password }}"
+      vm_extra_vars: guest.yml
       vm_template: guest.xml.j2
 
   - import_tasks: config_vm.yml
     vars:
-      vm_image_file: "{{ trex_image_file }}"
-      vm_base_image_file: "{{ trex_base_image_file }}"
-      vm_remote_image: "{{ trex_remote_image }}"
-      vm_name: "{{ trex_name }}"
-      vm_ip: "{{ trex_ip }}"
-      vm_mac: "{{ trex_mac }}"
-      vm_root_password: "{{ trex_root_password }}"
+      vm_extra_vars: trex.yml
       vm_template: trex.xml.j2
-
 
 # Add the guest to the inventory to continue running commands in it
   - name: Add guest to inventory
@@ -139,7 +134,7 @@
 - name: Vhost-User Guest Setup
   hosts: guests
   vars_files:
-    - vars/pvp-settings.yml
+    - vars/guest.yml
   tasks:
 
   - name: install repository
@@ -161,7 +156,7 @@
 - name: PVP  TRex Setup
   hosts: trex
   vars_files:
-    - vars/pvp-settings.yml
+    - vars/trex.yml
   tasks:
 
   - name: install repository
@@ -177,7 +172,7 @@
   - import_tasks: install_lnst.yml
     vars:
       lnst_repo: "{{ trex_lnst_repo }}"
-      lnst_ref: master
+      lnst_ref: " {{ trex_lnst_ref }}"
 
   - name: Install dependencies
     yum:
