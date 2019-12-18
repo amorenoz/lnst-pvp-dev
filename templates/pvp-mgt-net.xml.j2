@@ -9,8 +9,8 @@
     <host ip="{{ trex_vars.vm_ip }}">
       <hostname>{{ trex_vars.vm_name }}</hostname>
     </host>
-    <host ip="{{ trex_ip }}">
-      <hostname>{{ trex_name }}</hostname>
+    <host ip="{{ trex_vars.vm_ip }}">
+      <hostname>{{ trex_vars.vm_name }}</hostname>
     </host>
   </dns>
   <ip address="192.168.40.1" netmask="255.255.255.0">
