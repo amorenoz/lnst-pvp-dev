@@ -117,17 +117,17 @@
 # Add the guest to the inventory to continue running commands in it
   - name: Add guest to inventory
     add_host:
-      name: "{{ guest_ip }}"
+      name: "{{ guest_vars.vm_ip }}"
       group: guests
-      ansible_ssh_pass: "{{ guest_root_password }}"
+      ansible_ssh_pass: "{{ guest_vars.vm_root_password }}"
       ansible_ssh_user: root
       ansible_ssh_common_args: -o UserKnownHostsFile="/dev/null" -o StrictHostKeyChecking=no
 
   - name: Add trex to inventory
     add_host:
-      name: "{{ trex_ip }}"
+      name: "{{ trex_vars.vm_ip }}"
       group: trex
-      ansible_ssh_pass: "{{ trex_root_password }}"
+      ansible_ssh_pass: "{{ trex_vars.vm_root_password }}"
       ansible_ssh_user: root
       ansible_ssh_common_args: -o UserKnownHostsFile="/dev/null" -o StrictHostKeyChecking=no
 
@@ -143,14 +143,14 @@
       description: virtio-auto repository
       baseurl: "{{ item }}"
       gpgcheck: no
-    loop: "{{ guest_repos }}"
+    loop: "{{ os_repos }}"
     loop_control:
       index_var: index
 
   - import_tasks: install_lnst.yml
     vars:
-      lnst_repo: "{{ guest_lnst_repo }}"
-      lnst_ref: master
+      repo: "{{ lnst_repo }}"
+      ref: master
 
 
 - name: PVP  TRex Setup
@@ -165,14 +165,14 @@
       description: virtio-auto repository
       baseurl: "{{ item }}"
       gpgcheck: no
-    loop: "{{ trex_repos }}"
+    loop: "{{ os_repos }}"
     loop_control:
       index_var: index
 
   - import_tasks: install_lnst.yml
     vars:
-      lnst_repo: "{{ trex_lnst_repo }}"
-      lnst_ref: " {{ trex_lnst_ref }}"
+      repo: "{{ lnst_repo }}"
+      ref: " {{ lnst_ref }}"
 
   - name: Install dependencies
     yum:

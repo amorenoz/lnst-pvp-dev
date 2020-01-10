@@ -1,6 +1,6 @@
 # Varialbles needed:
-# lnst_repo
-# lnst_ref
+# repo
+# ref
 
 - name: Install dependencies
   yum:
@@ -15,15 +15,15 @@
 
 - name: Download lnst
   shell: |
-    cd /opt/ && git clone {{ lnst_repo }}
-    cd /opt/lnst && git checkout {{ lnst_ref }}
+    cd /opt/ && git clone {{ repo }}
+    cd /opt/lnst && git checkout {{ ref }}
 
 - name: Install lnst
   shell: |
     cd /opt/lnst
     python3 -m pip install -r requirements.txt
     python3 setup.py install
-    cd /opt/lnst && git checkout {{ lnst_ref }}
+    cd /opt/lnst && git checkout {{ ref }}
     ln -s /usr/local/bin/lnst-slave /usr/bin/lnst-slave
     cp dist/lnst-slave.service /etc/systemd/system
 

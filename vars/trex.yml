@@ -1,18 +1,23 @@
 vm_base_image_file: /var/lib/libvirt/images/rhel8-base.qcow2
 vm_remote_image: http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/images/rhel-guest-image-8.1-109.x86_64.qcow2
-vm_image_file: /var/lib/libvirt/images/pvp-vm.qcow2
-vm_name: pvp-vm1
+vm_image_file: /var/lib/libvirt/images/pvp-trex.qcow2
+vm_name: pvp-trex
 vm_mac: 02:ca:fe:fa:cc:00
 vm_ip: 192.168.40.6
 vm_root_password: lnst
 
+# Variables used for xml templating
+hugepage_size: 1048576
+hugepage_unit: KiB
+
 trex_nic1: 02:ca:fe:fa:cc:01
 trex_nic2: 02:ca:fe:fa:cc:02
-trex_lnst_repo: https://github.com/amorenoz/lnst.git
-trex_lnst_ref: master
+
+lnst_repo: https://github.com/amorenoz/lnst.git
+lnst_ref: master
 
 
-trex_repos:
+os_repos:
   - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/BaseOS/x86_64/os/
   - http://download.eng.bos.redhat.com/composes/released-rhel-8/RHEL-8/8.1.0-Beta/AppStream/x86_64/os/
 
